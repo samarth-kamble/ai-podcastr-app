@@ -1,4 +1,5 @@
 "use client";
+
 import { SignedIn, UserButton, useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,13 +9,24 @@ import Carousel from "./Carousel";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useRouter } from "next/navigation";
+import LoaderSpinner from "./LoaderSpinner";
+import { useAudio } from "@/providers/AudioProvider";
+import { cn } from "@/lib/utils";
 
 const RightSidebar = () => {
   const { user } = useUser();
   const topPodcasters = useQuery(api.users.getTopUserByPodcastCount);
   const router = useRouter();
+
+  const { audio } = useAudio();
+  if (!topPodcasters) return <LoaderSpinner />;
+
   return (
-    <section className="right_sidebar text-white-1">
+    <section
+      className={cn("right_sidebar h-[calc(100vh-5px]", {
+        "h-[calc(100vh-116px)]": audio?.audioUrl,
+      })}
+    >
       <SignedIn>
         <Link href={`/profile/${user?.id}`} className="flex gap-3 pb-12">
           <UserButton />
@@ -23,8 +35,8 @@ const RightSidebar = () => {
               {user?.firstName} {user?.lastName}
             </h1>
             <Image
-              src={"/icons/right-arrow.svg"}
-              alt="right-arrow"
+              src="/icons/right-arrow.svg"
+              alt="arrow"
               width={24}
               height={24}
             />
@@ -35,7 +47,6 @@ const RightSidebar = () => {
         <Header headerTitle="Fans Like You" />
         <Carousel fansLikeDetail={topPodcasters!} />
       </section>
-
       <section className="flex flex-col gap-8 pt-12">
         <Header headerTitle="Top Podcastrs" />
         <div className="flex flex-col gap-6">
@@ -58,8 +69,8 @@ const RightSidebar = () => {
                 </h2>
               </figure>
               <div className="flex items-center">
-                <p className="text-12 font-normal">
-                  {podcaster.totalPodcasts} podcasts
+                <p className="text-12 font-normal text-white-1">
+                  {podcaster.totalPodcasts} Podcasts
                 </p>
               </div>
             </div>

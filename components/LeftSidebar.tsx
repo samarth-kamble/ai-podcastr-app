@@ -1,4 +1,5 @@
 "use client";
+
 import { sidebarLinks } from "@/constants";
 import { cn } from "@/lib/utils";
 import { SignedIn, SignedOut, useClerk } from "@clerk/nextjs";
@@ -7,34 +8,45 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 import { Button } from "./ui/button";
-import { LogOut } from "lucide-react";
+import { useAudio } from "@/providers/AudioProvider";
+import { LogIn, LogOut } from "lucide-react";
 
 const LeftSidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const { signOut } = useClerk();
+  const { audio } = useAudio();
+
   return (
-    <section className="left_sidebar">
+    <section
+      className={cn("left_sidebar h-[calc(100vh-5px]", {
+        "h-[calc(100vh-116px)]": audio?.audioUrl,
+      })}
+    >
       <nav className="flex flex-col gap-6">
         <Link
-          href={"/"}
-          className="flex cursor-pointer items-center gap-1 pb-10"
+          href="/"
+          className="flex cursor-pointer items-center gap-1 pb-10 max-lg:justify-center"
         >
-          <Image src="/icons/logo.svg" alt="Logo" width={23} height={27} />
+          <Image src="/icons/logo.svg" alt="logo" width={23} height={27} />
           <h1 className="text-24 font-extrabold text-white max-lg:hidden">
             Podcastr
           </h1>
         </Link>
+
         {sidebarLinks.map(({ route, label, imgURL }) => {
           const isActive =
             pathname === route || pathname.startsWith(`${route}/`);
+
           return (
             <Link
-              key={label}
               href={route}
+              key={label}
               className={cn(
                 "flex gap-3 items-center py-4 max-lg:px-4 justify-center lg:justify-start",
-                { "bg-nav-focus border-r-4 border-orange-1": isActive }
+                {
+                  "bg-nav-focus border-r-4 border-orange-1": isActive,
+                }
               )}
             >
               <Image src={imgURL} alt={label} width={24} height={24} />
@@ -46,7 +58,10 @@ const LeftSidebar = () => {
       <SignedOut>
         <div className="flex-center w-full pb-14 max-lg:px-4 lg:pr-8">
           <Button asChild className="text-16 w-full bg-orange-1 font-extrabold">
-            <Link href="/sign-in">Sign In</Link>
+            <Link href="/sign-in">
+              Sign in
+              <LogIn className="w-4 h-4 ml-1" />
+            </Link>
           </Button>
         </div>
       </SignedOut>
@@ -56,7 +71,7 @@ const LeftSidebar = () => {
             className="text-16 w-full bg-orange-1 font-extrabold"
             onClick={() => signOut(() => router.push("/"))}
           >
-            Log Out <LogOut className="w-5 h-5 ml-2" />
+            Log Out <LogOut className="w-4 h-4 ml-1" />
           </Button>
         </div>
       </SignedIn>

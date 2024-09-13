@@ -181,7 +181,7 @@ export const updatePodcastViews = mutation({
     }
 
     return await ctx.db.patch(args.podcastId, {
-      views: podcast.views + 1,
+      views: (podcast.views || 0) + 1,
     });
   },
 });
